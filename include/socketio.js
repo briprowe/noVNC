@@ -22,9 +22,11 @@ ws_proxy = "http://localhost:8000/";
 }());
 
 
-function Websock() {
+function Websock(sock) {
 "use strict";
 
+  var socket = sock;
+  
 var api = {},         // Public API
     websocket = null, // WebSocket object
     rQ = [],          // Receive queue
@@ -140,10 +142,10 @@ function encode_message() {
 }
 
 function decode_message(data) {
-    //Util.Debug(">> decode_message: " + data);
+  //Util.Debug(">> decode_message: " + data);
     /* base64 decode */
     rQ = rQ.concat(Base64.decode(data, 0));
-    //Util.Debug(">> decode_message, rQ: " + rQ);
+  //Util.Debug(">> decode_message, rQ: " + rQ);
 }
 
 
@@ -187,7 +189,7 @@ function send_string(str) {
 // Other public functions
 
 function recv_message(data) {
-    //Util.Debug(">> recv_message: " + e.data.length);
+  Util.Debug(">> recv_message: " + data);
 
     try {
         decode_message(data);
@@ -203,6 +205,7 @@ function recv_message(data) {
             Util.Debug("Ignoring empty message");
         }
     } catch (exc) {
+      Util.Info("recv_message: exception");
         if (typeof exc.stack !== 'undefined') {
             Util.Warn("recv_message, caught exception: " + exc.stack);
         } else if (typeof exc.description !== 'undefined') {
@@ -216,7 +219,7 @@ function recv_message(data) {
             eventHandlers.error(exc);
         }
     }
-    //Util.Debug("<< recv_message");
+  Util.Debug("<< recv_message");
 }
 
 
@@ -233,10 +236,18 @@ function init() {
 }
 
 function open(uri) {
+  Util.Debug(">> socketio.connect");
+  Util.Info("socketio.sock: " + sock);
     init();
+  Util.Info("socketio.sock.connected: " + sock.connected);
 
     if (test_mode) {
         websocket = {};
+    } else if( sock ) {
+      websocket = sock;
+      websocket.bufferedAmount = 0;
+      eventHandlers.open();
+      
     } else {
         websocket = io.connect(uri, {'force new connection':true /*, transports: ['xhr-polling']*/ });
         websocket.bufferedAmount = 0;
@@ -261,6 +272,8 @@ function open(uri) {
         eventHandlers.error(e);
         Util.Debug("<< WebSock.onerror");
     };*/
+  Util.Debug("<< socketio.connect");
+
 }
 
 function close() {

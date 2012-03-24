@@ -54,9 +54,10 @@ if (window.WebSocket && !window.WEB_SOCKET_FORCE_FLASH) {
 }
 
 
-function Websock() {
+function Websock(sock) {
 "use strict";
 
+  var socket = sock;
 var api = {},         // Public API
     websocket = null, // WebSocket object
     rQ = [],          // Receive queue
@@ -270,7 +271,7 @@ function open(uri) {
     if (test_mode) {
         websocket = {};
     } else {
-        websocket = new WebSocket(uri, 'base64');
+        websocket = sock || new WebSocket(uri, 'base64');
         // TODO: future native binary support
         //websocket = new WebSocket(uri, ['binary', 'base64']);
     }

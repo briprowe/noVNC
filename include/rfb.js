@@ -149,6 +149,8 @@ Util.conf_defaults(conf, that, defaults, [
     ['check_rate',         'rw', 'int', 217,  'Timing (ms) of send/receive check'],
     ['fbu_req_rate',       'rw', 'int', 1413, 'Timing (ms) of frameBufferUpdate requests'],
 
+    ['socket',             'rw', 'dom', null, 'Use this socket for the VNC session.'],
+
     // Callback functions
     ['onUpdateState',      'rw', 'func', function() { },
         'onUpdateState(rfb, state, oldstate, statusMsg): RFB state update/change '],
@@ -224,7 +226,7 @@ function constructor() {
 
     rmode = display.get_render_mode();
 
-    ws = new Websock();
+    ws = new Websock(socket);
     ws.on('message', handle_message);
     ws.on('open', function() {
         if (rfb_state === "connect") {
@@ -515,9 +517,9 @@ fail = function(msg) {
 };
 
 handle_message = function() {
-    //Util.Debug(">> handle_message ws.rQlen(): " + ws.rQlen());
-    //Util.Debug("ws.rQslice(0,20): " + ws.rQslice(0,20) + " (" + ws.rQlen() + ")");
-    if (ws.rQlen() === 0) {
+  Util.Debug(">> handle_message ws.rQlen(): " + ws.rQlen() + " state: " + rfb_state);
+  Util.Debug("ws.rQslice(0,20): " + ws.rQslice(0,20) + " (" + ws.rQlen() + ")");
+  if (ws.rQlen() === 0) {
         Util.Warn("handle_message called on empty receive queue");
         return;
     }
