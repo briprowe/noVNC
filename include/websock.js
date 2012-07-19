@@ -20,43 +20,44 @@
 
 // Load Flash WebSocket emulator if needed
 
-if (window.WebSocket && !window.WEB_SOCKET_FORCE_FLASH) {
-    Websock_native = true;
-} else if (window.MozWebSocket && !window.WEB_SOCKET_FORCE_FLASH) {
-    Websock_native = true;
-    window.WebSocket = window.MozWebSocket;
-} else {
-    /* no builtin WebSocket so load web_socket.js */
+// if (window.WebSocket && !window.WEB_SOCKET_FORCE_FLASH) {
+//     Websock_native = true;
+// } else if (window.MozWebSocket && !window.WEB_SOCKET_FORCE_FLASH) {
+//     Websock_native = true;
+//     window.WebSocket = window.MozWebSocket;
+// } else {
+//     /* no builtin WebSocket so load web_socket.js */
 
-    // To enable debug:
-    // window.WEB_SOCKET_DEBUG=1;
+//     // To enable debug:
+//     // window.WEB_SOCKET_DEBUG=1;
 
-    Websock_native = false;
-    (function () {
-        function get_INCLUDE_URI() {
-            return (typeof INCLUDE_URI !== "undefined") ?
-                INCLUDE_URI : "include/";
-        }
+//     Websock_native = false;
+//     (function () {
+//         function get_INCLUDE_URI() {
+//             return (typeof INCLUDE_URI !== "undefined") ?
+//                 INCLUDE_URI : "include/";
+//         }
 
-        var start = "<script src='" + get_INCLUDE_URI(),
-            end = "'><\/script>", extra = "";
+//         var start = "<script src='" + get_INCLUDE_URI(),
+//             end = "'><\/script>", extra = "";
 
-        window.WEB_SOCKET_SWF_LOCATION = get_INCLUDE_URI() +
-                    "web-socket-js/WebSocketMain.swf";
-        if (Util.Engine.trident) {
-            Util.Debug("Forcing uncached load of WebSocketMain.swf");
-            window.WEB_SOCKET_SWF_LOCATION += "?" + Math.random();
-        }
-        extra += start + "web-socket-js/swfobject.js" + end;
-        extra += start + "web-socket-js/web_socket.js" + end;
-        document.write(extra);
-    }());
-}
+//         window.WEB_SOCKET_SWF_LOCATION = get_INCLUDE_URI() +
+//                     "web-socket-js/WebSocketMain.swf";
+//         if (Util.Engine.trident) {
+//             Util.Debug("Forcing uncached load of WebSocketMain.swf");
+//             window.WEB_SOCKET_SWF_LOCATION += "?" + Math.random();
+//         }
+//         extra += start + "web-socket-js/swfobject.js" + end;
+//         extra += start + "web-socket-js/web_socket.js" + end;
+//         document.write(extra);
+//     }());
+// }
 
+Websock_native = true;
 
 function Websock(sock) {
 "use strict";
-
+  console.log("sock ctor:" + sock);
   var socket = sock;
 var api = {},         // Public API
     websocket = null, // WebSocket object
@@ -94,6 +95,7 @@ function set_rQi(val) {
 }
 
 function rQlen() {
+  console.log("rQ.length: " + rQ.length + " rQi: " + rQi);
     return rQ.length - rQi;
 }
 
@@ -271,7 +273,8 @@ function open(uri) {
     if (test_mode) {
         websocket = {};
     } else {
-        websocket = sock || new WebSocket(uri, 'base64');
+      console.log("sock: " + socket);
+        websocket = socket || new WebSocket(uri, 'base64');
         // TODO: future native binary support
         //websocket = new WebSocket(uri, ['binary', 'base64']);
     }
@@ -295,9 +298,11 @@ function open(uri) {
         eventHandlers.error(e);
         Util.Debug("<< WebSock.onerror");
     };
+  eventHandlers.open();
 }
 
 function close() {
+//  debugger
     if (websocket) {
         if ((websocket.readyState === WebSocket.OPEN) ||
             (websocket.readyState === WebSocket.CONNECTING)) {

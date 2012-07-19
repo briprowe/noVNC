@@ -13,7 +13,7 @@
 /*global window, Util, Display, Keyboard, Mouse, Websock, Websock_native, Base64, DES */
 
 
-function RFB(defaults) {
+function RFB(defaults, socket) {
 "use strict";
 
 var that           = {},  // Public API methods
@@ -408,7 +408,7 @@ updateState = function(state, statusMsg) {
             }
         }
 
-        ws.close();
+      //ws.close();
     }
 
     if (oldstate === 'fatal') {
