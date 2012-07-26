@@ -272,7 +272,7 @@ function open(uri) {
     if (test_mode) {
         websocket = {};
     } else {
-        websocket = new WebSocket(uri, 'base64');
+        websocket = new WebSocket(uri);
         // TODO: future native binary support
         //websocket = new WebSocket(uri, ['binary', 'base64']);
     }
